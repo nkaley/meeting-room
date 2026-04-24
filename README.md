@@ -82,6 +82,7 @@ npm run dev            # http://localhost:5173
 
 - Sign-up restricted to the configured corporate domain.
 - Email verification via one-time code with resend cooldown.
+- Password reset via one-time code (`/forgot-password` → `/reset-password`).
 - JWT login, `GET /auth/me`, role guards.
 - First verified user becomes `ADMIN`.
 - Admin CRUD for offices and meeting rooms (soft delete).
@@ -89,6 +90,7 @@ npm run dev            # http://localhost:5173
 - User CRUD for bookings with overlap detection and permission checks.
 - Calendar views (week / day) with filters by office and room, 24h time axis.
 - Native-looking toast notifications, in-app confirmation dialogs, dark theme with yellow accents.
+- Responsive layout: header, admin, calendar filters and modals adapt to mobile screens.
 
 ## Project layout
 

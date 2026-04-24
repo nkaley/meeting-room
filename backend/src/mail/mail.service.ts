@@ -7,7 +7,19 @@ export class MailService {
 
   async sendVerificationCode(email: string, code: string): Promise<void> {
     this.logger.log(`Verification code for ${email}: ${code}`);
+    await this.send(email, 'Код подтверждения email', `Ваш код подтверждения: ${code}`);
+  }
 
+  async sendPasswordResetCode(email: string, code: string): Promise<void> {
+    this.logger.log(`Password reset code for ${email}: ${code}`);
+    await this.send(
+      email,
+      'Код восстановления пароля',
+      `Ваш код для сброса пароля: ${code}. Если вы не запрашивали восстановление, проигнорируйте это письмо.`,
+    );
+  }
+
+  private async send(to: string, subject: string, text: string): Promise<void> {
     const host = process.env.SMTP_HOST;
     const port = Number(process.env.SMTP_PORT ?? 465);
     const secure = String(process.env.SMTP_SECURE ?? 'true') === 'true';
@@ -38,15 +50,10 @@ export class MailService {
         auth: { user, pass },
       });
 
-      await transporter.sendMail({
-        from,
-        to: email,
-        subject: 'Код подтверждения email',
-        text: `Ваш код подтверждения: ${code}`,
-      });
+      await transporter.sendMail({ from, to, subject, text });
     } catch (error) {
       this.logger.error(
-        `Failed to send verification email to ${email}: ${(error as Error).message}`,
+        `Failed to send email to ${to}: ${(error as Error).message}`,
       );
     }
   }

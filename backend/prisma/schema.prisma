@@ -14,17 +14,18 @@ enum UserRole {
 }
 
 model User {
-  id                String                  @id @default(uuid())
-  email             String                  @unique
-  passwordHash      String
-  firstName         String?
-  lastName          String?
-  role              UserRole                @default(USER)
-  emailVerified     Boolean                 @default(false)
-  createdAt         DateTime                @default(now())
-  updatedAt         DateTime                @updatedAt
-  bookings          Booking[]
-  verificationCodes EmailVerificationCode[]
+  id                 String                  @id @default(uuid())
+  email              String                  @unique
+  passwordHash       String
+  firstName          String?
+  lastName           String?
+  role               UserRole                @default(USER)
+  emailVerified      Boolean                 @default(false)
+  createdAt          DateTime                @default(now())
+  updatedAt          DateTime                @updatedAt
+  bookings           Booking[]
+  verificationCodes  EmailVerificationCode[]
+  passwordResetCodes PasswordResetCode[]
 }
 
 model EmailVerificationCode {
@@ -35,6 +36,18 @@ model EmailVerificationCode {
   usedAt    DateTime?
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+model PasswordResetCode {
+  id        String    @id @default(uuid())
+  userId    String
+  code      String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt])
 }

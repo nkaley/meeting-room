@@ -18,7 +18,13 @@ export function LoginPage() {
       setAuth(resp.data.accessToken, resp.data.user);
       navigate('/');
     },
-    onError: (err) => setError(extractApiError(err)),
+    onError: (err) => {
+      const message = extractApiError(err);
+      setError(message);
+      if (message.toLowerCase().includes('подтвердите email')) {
+        setTimeout(() => navigate(`/verify-email?email=${encodeURIComponent(email)}`), 1200);
+      }
+    },
   });
 
   const onSubmit = (e: FormEvent) => {
@@ -57,7 +63,7 @@ export function LoginPage() {
         </button>
         <div className="auth__links">
           <Link to="/register">Нет аккаунта? Зарегистрироваться</Link>
-          <Link to="/verify-email">Подтвердить email</Link>
+          <Link to="/forgot-password">Забыли пароль?</Link>
         </div>
       </form>
     </div>
