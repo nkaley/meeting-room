@@ -24,9 +24,29 @@ export class OfficesService {
 
   async remove(id: string) {
     await this.getOrThrow(id);
-    return this.prisma.office.update({
-      where: { id },
-      data: { isActive: false },
+    const now = new Date();
+    return this.prisma.$transaction(async (tx) => {
+      const rooms = await tx.room.findMany({
+        where: { officeId: id, isActive: true },
+        select: { id: true },
+      });
+      const roomIds = rooms.map((room) => room.id);
+      if (roomIds.length > 0) {
+        await tx.booking.deleteMany({
+          where: {
+            roomId: { in: roomIds },
+            startAt: { gt: now },
+          },
+        });
+        await tx.room.updateMany({
+          where: { id: { in: roomIds } },
+          data: { isActive: false },
+        });
+      }
+      return tx.office.update({
+        where: { id },
+        data: { isActive: false },
+      });
     });
   }
 

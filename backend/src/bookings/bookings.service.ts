@@ -27,7 +27,7 @@ export class BookingsService {
         room: {
           include: { office: { select: { id: true, name: true } } },
         },
-        user: { select: { id: true, email: true } },
+        user: { select: { id: true, email: true, firstName: true, lastName: true } },
       },
       orderBy: { startAt: 'asc' },
     });
@@ -83,13 +83,13 @@ export class BookingsService {
     const startAt = new Date(startAtRaw);
     const endAt = new Date(endAtRaw);
     if (Number.isNaN(startAt.getTime()) || Number.isNaN(endAt.getTime())) {
-      throw new BadRequestException('Ошибка валидации');
+      throw new BadRequestException('Некорректные дата или время');
     }
     if (endAt <= startAt) {
       throw new BadRequestException('Время окончания должно быть больше времени начала');
     }
     if (startAt < new Date()) {
-      throw new BadRequestException('Нельзя выбрать прошедшее время');
+      throw new BadRequestException('Нельзя создать бронь в прошлом');
     }
     return { startAt, endAt };
   }
@@ -105,8 +105,11 @@ export class BookingsService {
       where: { id: roomId },
       include: { office: true },
     });
-    if (!room || !room.isActive || !room.office.isActive) {
-      throw new BadRequestException('Сущность не найдена');
+    if (!room) {
+      throw new NotFoundException('Переговорка не найдена');
+    }
+    if (!room.isActive || !room.office.isActive) {
+      throw new BadRequestException('Переговорка недоступна для бронирования');
     }
     if (!room.isBookable) {
       throw new BadRequestException('Переговорка недоступна для бронирования');

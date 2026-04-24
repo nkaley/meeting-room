@@ -10,11 +10,11 @@ import {
 } from 'class-validator';
 
 export class UpsertRoomDto {
-  @IsString()
-  @MinLength(1)
+  @IsString({ message: 'Название обязательно' })
+  @MinLength(1, { message: 'Название обязательно' })
   name!: string;
 
-  @IsUUID()
+  @IsUUID('all', { message: 'Выберите офис' })
   officeId!: string;
 
   @IsOptional()
@@ -23,14 +23,14 @@ export class UpsertRoomDto {
 
   @IsOptional()
   @Type(() => Number)
-  @IsInt()
-  @Min(1)
+  @IsInt({ message: 'Вместимость должна быть положительным числом' })
+  @Min(1, { message: 'Вместимость должна быть положительным числом' })
   capacity?: number;
 
   @IsOptional()
   @IsString()
   description?: string;
 
-  @IsBoolean()
+  @IsBoolean({ message: 'Некорректное значение доступности' })
   isBookable!: boolean;
 }

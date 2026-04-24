@@ -1,17 +1,17 @@
 import { IsDateString, IsOptional, IsString, IsUUID, MinLength } from 'class-validator';
 
 export class UpsertBookingDto {
-  @IsUUID()
+  @IsUUID('all', { message: 'Выберите переговорку' })
   roomId!: string;
 
-  @IsDateString()
+  @IsDateString({}, { message: 'Некорректное время начала' })
   startAt!: string;
 
-  @IsDateString()
+  @IsDateString({}, { message: 'Некорректное время окончания' })
   endAt!: string;
 
-  @IsString()
-  @MinLength(1)
+  @IsString({ message: 'Описание обязательно' })
+  @MinLength(1, { message: 'Описание обязательно' })
   description!: string;
 }
 

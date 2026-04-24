@@ -25,9 +25,15 @@ export class RoomsService {
 
   async remove(id: string) {
     await this.getOrThrow(id);
-    return this.prisma.room.update({
-      where: { id },
-      data: { isActive: false },
+    const now = new Date();
+    return this.prisma.$transaction(async (tx) => {
+      await tx.booking.deleteMany({
+        where: { roomId: id, startAt: { gt: now } },
+      });
+      return tx.room.update({
+        where: { id },
+        data: { isActive: false },
+      });
     });
   }
 

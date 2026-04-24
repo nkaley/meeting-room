@@ -50,6 +50,8 @@ export class AuthService {
       data: {
         email: payload.email.toLowerCase(),
         passwordHash,
+        firstName: payload.firstName.trim(),
+        lastName: payload.lastName.trim(),
         emailVerified: false,
       },
     });
@@ -155,13 +157,19 @@ export class AuthService {
       throw new UnauthorizedException('Неверный email или пароль');
     }
     if (!user.emailVerified) {
-      throw new UnauthorizedException('Email не подтвержден');
+      throw new UnauthorizedException('Подтвердите email, чтобы войти в систему');
     }
 
     const accessToken = await this.jwtService.signAsync({ sub: user.id });
     return {
       accessToken,
-      user: { id: user.id, email: user.email, role: user.role },
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      },
     };
   }
 
@@ -170,6 +178,12 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('Пользователь не найден');
     }
-    return { id: user.id, email: user.email, role: user.role };
+    return {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      firstName: user.firstName,
+      lastName: user.lastName,
+    };
   }
 }

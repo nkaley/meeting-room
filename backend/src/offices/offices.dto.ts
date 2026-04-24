@@ -1,15 +1,15 @@
 import { IsString, MinLength } from 'class-validator';
 
 export class UpsertOfficeDto {
-  @IsString()
-  @MinLength(2)
+  @IsString({ message: 'Название обязательно' })
+  @MinLength(2, { message: 'Название должно содержать минимум 2 символа' })
   name!: string;
 
-  @IsString()
-  @MinLength(1)
+  @IsString({ message: 'Город обязателен' })
+  @MinLength(1, { message: 'Город обязателен' })
   city!: string;
 
-  @IsString()
-  @MinLength(1)
+  @IsString({ message: 'Адрес обязателен' })
+  @MinLength(1, { message: 'Адрес обязателен' })
   address!: string;
 }
