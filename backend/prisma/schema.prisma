@@ -1,0 +1,81 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  USER
+}
+
+model User {
+  id                String                  @id @default(uuid())
+  email             String                  @unique
+  passwordHash      String
+  role              UserRole                @default(USER)
+  emailVerified     Boolean                 @default(false)
+  createdAt         DateTime                @default(now())
+  updatedAt         DateTime                @updatedAt
+  bookings          Booking[]
+  verificationCodes EmailVerificationCode[]
+}
+
+model EmailVerificationCode {
+  id        String   @id @default(uuid())
+  userId    String
+  code      String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+model Office {
+  id        String   @id @default(uuid())
+  name      String
+  city      String
+  address   String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  rooms     Room[]
+}
+
+model Room {
+  id         String    @id @default(uuid())
+  officeId   String
+  name       String
+  floor      String?
+  capacity   Int?
+  description String?
+  isBookable Boolean   @default(true)
+  isActive   Boolean   @default(true)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  office     Office    @relation(fields: [officeId], references: [id])
+  bookings   Booking[]
+
+  @@index([officeId, isActive])
+}
+
+model Booking {
+  id          String   @id @default(uuid())
+  roomId       String
+  userId       String
+  startAt      DateTime
+  endAt        DateTime
+  description  String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  room         Room     @relation(fields: [roomId], references: [id])
+  user         User     @relation(fields: [userId], references: [id])
+
+  @@index([roomId, startAt, endAt])
+  @@index([startAt, endAt])
+}

@@ -1,0 +1,38 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: meeting_rooms_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: meeting_rooms
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  backend:
+    build:
+      context: ./backend
+    container_name: meeting_rooms_backend
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - postgres
+    ports:
+      - "3000:3000"
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: meeting_rooms_frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "8080:80"
+
+volumes:
+  postgres_data:
