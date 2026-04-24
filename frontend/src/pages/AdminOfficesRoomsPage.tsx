@@ -188,30 +188,23 @@ export function AdminOfficesRoomsPage() {
             <ul className="list">
               {rooms.map((room) => {
                 const officeName = room.office?.name ?? officesById.get(room.officeId)?.name ?? '—';
-                const metaParts: string[] = [];
-                if (room.floor) metaParts.push(`этаж ${room.floor}`);
-                if (room.capacity) metaParts.push(`до ${room.capacity} чел.`);
+                const metaLine = [
+                  officeName,
+                  room.floor ? `этаж ${room.floor}` : null,
+                  room.capacity ? `до ${room.capacity} чел.` : null,
+                ]
+                  .filter(Boolean)
+                  .join(' · ');
                 return (
                   <li key={room.id} className="list__item">
                     <div className="list__info">
                       <div className="list__title">
                         {room.name}
-                        <span
-                          className={
-                            room.isBookable
-                              ? 'badge badge--success'
-                              : 'badge badge--muted'
-                          }
-                        >
-                          {room.isBookable ? 'доступна' : 'недоступна'}
-                        </span>
-                      </div>
-                      <div className="list__meta">
-                        <span className="badge badge--office">{officeName}</span>
-                        {metaParts.length > 0 && (
-                          <span className="list__meta-dot">{metaParts.join(' · ')}</span>
+                        {!room.isBookable && (
+                          <span className="badge badge--muted">недоступна</span>
                         )}
                       </div>
+                      <div className="list__meta">{metaLine}</div>
                     </div>
                     <div className="list__actions">
                       <button
